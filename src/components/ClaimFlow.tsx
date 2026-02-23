@@ -127,6 +127,12 @@ export function ClaimFlow() {
       });
       
       confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+
+      // Esperar 3 segundos para que la blockchain confirme y redirigir al perfil
+      setTimeout(() => {
+        router.push(`/profile/${publicKey?.toBase58()}`);
+        router.refresh(); // fuerza re-fetch de los NFTs
+      }, 3000);
     } catch (e) {
       const errorMsg = e instanceof Error ? e.message : "Error de conexión";
       console.error("Mint error:", e);

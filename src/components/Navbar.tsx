@@ -36,16 +36,16 @@ export function Navbar() {
           >
             Claim
           </Link>
-          {isMounted && walletShort ? (
+          {isMounted && publicKey && (
             <Link
-              href={`/profile/${publicKey!.toBase58()}`}
+              href={`/profile/${publicKey.toBase58()}`}
               className={`text-sm font-medium transition-colors hidden sm:inline-flex ${
                 pathname?.startsWith("/profile") ? "text-violet-400" : "text-white/80 hover:text-white"
               }`}
             >
               My Collection
             </Link>
-          ) : null}
+          )}
           {isMounted && (
             <div className="flex-shrink-0">
               <WalletMultiButton className="max-w-[160px] truncate text-sm px-3 py-1 sm:px-4 sm:py-2" />
