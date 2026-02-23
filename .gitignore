@@ -1,0 +1,33 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build
+.next
+out
+build
+dist
+
+# Env (secrets)
+.env
+.env.local
+.env*.local
+
+# Keypair files (never commit)
+mint-authority.json
+*-keypair.json
+
+# Debug / IDE
+.DS_Store
+*.log
+npm-debug.log*
+.idea
+.vscode
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
