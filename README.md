@@ -2,6 +2,8 @@
 
 > Your ticket doesn't disappear. It becomes history.
 
+🔗 **Live Demo:** [after-show.vercel.app](https://after-show.vercel.app)
+
 Aftershow transforms used event tickets into on-chain collectible NFTs on Solana. 
 Fans "burn" their ticket and receive a unique Aftershow NFT with verified event 
 metadata — building a permanent, provable cultural passport.
@@ -55,10 +57,10 @@ Use these ticket IDs to test the full claim flow:
 |-----------|--------|-------|------|
 | KYD-2026-001 | Bad Bunny | Estadio Monumental | Buenos Aires |
 | KYD-2026-002 | Beyoncé | River Plate | Buenos Aires |
-| KYD-2026-003 | Indio Solari | ... | ... |
-| KYD-2026-004 | Ultra Music Festival | ... | ... |
-| KYD-2026-005 | Lady Gaga | ... | ... |
-| KYD-2026-006 | Herbie Hancock | ... | ... |
+| KYD-2026-003 | Indio Solari | Estadio Único de La Plata | La Plata |
+| KYD-2026-004 | Ultra Music Festival | Hipódromo de Palermo | Buenos Aires |
+| KYD-2026-005 | Lady Gaga | Madison Square Garden | New York |
+| KYD-2026-006 | Herbie Hancock | Blue Note Jazz Club | New York |
 
 ## Project Structure
 ```

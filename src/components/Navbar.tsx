@@ -27,7 +27,7 @@ export function Navbar() {
           <Ticket className="w-6 h-6 text-violet-400" />
           Aftershow
         </Link>
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-3 sm:gap-6">
           <Link
             href="/claim"
             className={`text-sm font-medium transition-colors ${
@@ -39,14 +39,18 @@ export function Navbar() {
           {isMounted && walletShort ? (
             <Link
               href={`/profile/${publicKey!.toBase58()}`}
-              className={`text-sm font-medium transition-colors ${
+              className={`text-sm font-medium transition-colors hidden sm:inline-flex ${
                 pathname?.startsWith("/profile") ? "text-violet-400" : "text-white/80 hover:text-white"
               }`}
             >
               My Collection
             </Link>
           ) : null}
-          {isMounted && <WalletMultiButton />}
+          {isMounted && (
+            <div className="flex-shrink-0">
+              <WalletMultiButton className="max-w-[160px] truncate text-sm px-3 py-1 sm:px-4 sm:py-2" />
+            </div>
+          )}
         </div>
       </div>
     </nav>
