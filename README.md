@@ -4,31 +4,56 @@
 
 🔗 **Live Demo:** [after-show.vercel.app](https://after-show.vercel.app)
 
-Aftershow transforms used event tickets into on-chain collectible NFTs on Solana. 
-Fans "burn" their ticket and receive a unique Aftershow NFT with verified event 
-metadata — building a permanent, provable cultural passport.
+Aftershow is the fan engagement layer built on top of the [KYD Labs](https://kydlabs.com) / [TIX](https://tix.xyz) protocol. 
+When a fan attends an event powered by KYD, their ticket doesn't die at the door — 
+Aftershow converts it into a unique on-chain collectible NFT, building a permanent, 
+provable cultural passport on Solana.
 
 Built for the [Solana Graveyard Hackathon](https://solana.com/graveyard-hack) — 
 KYD Labs Ticketing category.
 
 ## The Problem
 
-Event tickets die the moment the show ends. There's no on-chain proof you were 
-there, no collectible memory, no lasting connection between fans and the artists 
-they love.
+TIX solves the financial side of live events — giving venues upfront capital and 
+artists control over their ticket sales. But what happens to the fan after the show?
+
+The ticket disappears. There's no on-chain proof you were there, no collectible 
+memory, no lasting connection between fans and the artists they love. The fan 
+experience ends when the lights come on.
 
 ## The Solution
 
-Aftershow converts post-event tickets into unique generative NFTs minted on Solana. 
-Each NFT features algorithmically generated artwork derived from the event data, 
-creating a one-of-a-kind digital memento that lives forever on-chain.
+Aftershow is the missing fan layer for the KYD/TIX ecosystem. It converts 
+post-event KYD tickets into unique generative NFTs minted on Solana — 
+each one a one-of-a-kind digital memento with verified event metadata 
+that lives forever on-chain.
+
+Think of it as the $TIX reward token made real: just like airline miles reward 
+loyal travelers, Aftershow NFTs reward fans for showing up — building a 
+verifiable history of their live event experiences.
 
 ## How It Works
 
 1. **Verify** — Enter your KYD ticket ID to confirm attendance
-2. **Generate** — We create unique generative artwork based on your event
-3. **Mint** — Your Aftershow NFT is minted on Solana devnet and sent to your wallet
-4. **Collect** — Build your Cultural Passport: a public profile showing every event you've attended
+2. **Generate** — Unique generative artwork is created from your event data
+3. **Mint** — Your Aftershow NFT is minted on Solana and sent to your wallet
+4. **Collect** — Build your Cultural Passport: a public profile proving every event you've attended
+
+## Why KYD + TIX
+
+KYD Labs is the largest on-chain ticketing platform in the world, backed by 
+a16z Crypto, having processed over $10M in ticket sales and $2M in venue 
+financing with zero defaults. Their TIX protocol — launched at Solana Breakpoint 
+2025 — turns tickets into RWAs that replace opaque loan agreements and give 
+artists and venues full financial control.
+
+Aftershow complements this vision by closing the loop on the fan side:
+
+| Layer | Protocol | What it solves |
+|-------|----------|----------------|
+| Financing | TIX | Venues get upfront capital, artists keep their data |
+| Ticketing | KYD | Direct-to-fan sales, resale control, fan insights |
+| **Fan rewards** | **Aftershow** | **Fans get on-chain proof and collectibles post-event** |
 
 ## Tech Stack
 
@@ -55,12 +80,12 @@ Use these ticket IDs to test the full claim flow:
 
 | Ticket ID | Artist | Venue | City |
 |-----------|--------|-------|------|
-| KYD-2026-001 | Bad Bunny | Estadio Monumental | Buenos Aires |
-| KYD-2026-002 | Beyoncé | River Plate | Buenos Aires |
-| KYD-2026-003 | Indio Solari | Estadio Único de La Plata | La Plata |
-| KYD-2026-004 | Ultra Music Festival | Hipódromo de Palermo | Buenos Aires |
-| KYD-2026-005 | Lady Gaga | Madison Square Garden | New York |
-| KYD-2026-006 | Herbie Hancock | Blue Note Jazz Club | New York |
+| KYD-2026-001 | Charli XCX | Le Poisson Rouge | New York |
+| KYD-2026-002 | Travis Scott | Le Poisson Rouge | New York |
+| KYD-2026-003 | Dillon Francis | Brooklyn Mirage | New York |
+| KYD-2026-004 | Robert Plant | Radio City Music Hall | New York |
+| KYD-2026-005 | Charli XCX | The Fonda Theatre | Los Angeles |
+| KYD-2026-006 | Dillon Francis | Exchange LA | Los Angeles |
 
 ## Project Structure
 ```
@@ -82,6 +107,15 @@ src/
     artwork.ts            → Artwork generation logic
 ```
 
+## Roadmap
+
+- [ ] Integration with live KYD/TIX API when available on mainnet (Summer 2026)
+- [ ] $TIX token rewards for fans who collect Aftershow NFTs
+- [ ] Artist-customizable artwork templates per event
+- [ ] Transferable Aftershow NFTs with resale royalties back to artists
+- [ ] Mobile app for scanning and instant claiming at the venue door
+
 ## License
 
 MIT
+```
