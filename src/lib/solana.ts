@@ -31,7 +31,6 @@ const getUmi = (() => {
   return () => {
     if (!umi) {
       const rpc = process.env.NEXT_PUBLIC_SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
-      // createUmiDefaults takes the RPC endpoint as the first parameter
       umi = createUmiDefaults(rpc).use(mplTokenMetadata());
       const secret = process.env.MINT_AUTHORITY_SECRET_KEY;
       if (secret) {
@@ -60,15 +59,6 @@ export interface MintAftershowParams {
   ownerWallet: string;
 }
 
-/**
- * Build a transaction to mint an NFT.
- * 
- * This function constructs but does NOT send the transaction.
- * The server signs only as updateAuthority (MINT_AUTHORITY).
- * The user (via Phantom) is the feePayer and signs to approve.
- * 
- * Returns: Transaction serialized to base64 (partially signed by server)
- */
 export async function buildMintTransaction(
   params: MintAftershowParams
 ): Promise<string> {
@@ -77,31 +67,13 @@ export async function buildMintTransaction(
     process.env.NEXT_PUBLIC_SOLANA_RPC_URL ?? "https://api.devnet.solana.com"
   );
 
-  // ========================================
-  // ROLE DEFINITIONS
-  // ========================================
-  // MINT_AUTHORITY: server-side keypair (from MINT_AUTHORITY_SECRET_KEY)
-  // - Signs as updateAuthority
-  // - Signs as mint authority
-  // - Does NOT pay fees
   const mintAuthority = umi.identity;
-  const mintAuthorityPubkey = new PublicKey(mintAuthority.publicKey.toString());
-
-  // USER WALLET: from request (Phantom wallet)
-  // - Is the feePayer (pays all transaction costs)
-  // - Is the tokenOwner (receives the NFT)
   const userWallet = new PublicKey(params.ownerWallet);
 
-  // ========================================
-  // STEP 1: BUILD INSTRUCTIONS AND GET SERIALIZABLE DATA
-  // ========================================
-  // Use UMI to construct the instructions, then extract the serializable data
   const mint = generateSigner(umi);
   const mintPubkey = new PublicKey(mint.publicKey.toString());
-  // Truncate name to 32 chars (Solana Token Metadata limit)
   const name = `Aftershow: ${params.ticket.eventName}`.slice(0, 32);
 
-  // Get instructions from UMI builders
   const createInstructions = await createV1(umi, {
     mint,
     authority: mintAuthority,
@@ -124,54 +96,34 @@ export async function buildMintTransaction(
     tokenStandard: TokenStandard.NonFungible,
   }).getInstructions();
 
-  // ========================================
-  // STEP 2: CONVERT UMI INSTRUCTIONS TO WEB3.JS FORMAT
-  // ========================================
   const convertedInstructions = [
     ...createInstructions.map(convertUmiToWeb3Instruction),
     ...mintInstructions.map(convertUmiToWeb3Instruction),
   ];
 
-  // ========================================
-  // STEP 3: BUILD VERSIONED TRANSACTION
-  // ========================================
   const latestBlockhash = await connection.getLatestBlockhash();
 
   const txMessage = new TransactionMessage({
-    payerKey: userWallet, // USER PAYS FEES
+    payerKey: userWallet,
     recentBlockhash: latestBlockhash.blockhash,
     instructions: convertedInstructions,
   });
 
   const tx = new VersionedTransaction(txMessage.compileToV0Message());
 
-  // ========================================
-  // STEP 4: PARTIAL SIGN WITH MINT_AUTHORITY AND MINT
-  // ========================================
-  // Get keypairs from UMI
   const mintAuthorityKeypair = Keypair.fromSecretKey(
     new Uint8Array((mintAuthority as any).secretKey)
   );
-
   const mintKeypair = Keypair.fromSecretKey(
     new Uint8Array((mint as any).secretKey)
   );
 
-  // Sign with both authorities (server side)
   tx.sign([mintAuthorityKeypair, mintKeypair]);
 
-  // ========================================
-  // STEP 5: SERIALIZE AND RETURN
-  // ========================================
   const txBuffer = tx.serialize();
-  const txBase64 = Buffer.from(txBuffer).toString("base64");
-
-  return txBase64;
+  return Buffer.from(txBuffer).toString("base64");
 }
 
-/**
- * Convert a UMI Instruction to a web3.js TransactionInstruction
- */
 function convertUmiToWeb3Instruction(umiInstruction: any): TransactionInstruction {
   return new TransactionInstruction({
     programId: new PublicKey(umiInstruction.programId.toString()),
@@ -182,6 +134,30 @@ function convertUmiToWeb3Instruction(umiInstruction: any): TransactionInstructio
     })),
     data: Buffer.from(umiInstruction.data),
   });
+}
+
+function parseMetadataJson(json: {
+  name?: string;
+  attributes?: Array<{ trait_type: string; value: string }>;
+}) {
+  let artist = "";
+  let venue = "";
+  let city = "";
+  let date = "";
+  let ticketId = "";
+
+  const attrs = json.attributes ?? [];
+  for (const a of attrs) {
+    if (a.trait_type === "Artist") artist = a.value;
+    if (a.trait_type === "Venue") venue = a.value;
+    if (a.trait_type === "City") city = a.value;
+    if (a.trait_type === "Date") date = a.value;
+    if (a.trait_type === "Ticket ID") ticketId = a.value;
+  }
+
+  const eventName = (json.name as string)?.replace(/^Aftershow: /, "") ?? "";
+
+  return { artist, venue, city, date, ticketId, eventName };
 }
 
 export async function fetchAftershowNftsByOwner(ownerWallet: string): Promise<AfterShowNFT[]> {
@@ -212,15 +188,24 @@ export async function fetchAftershowNftsByOwner(ownerWallet: string): Promise<Af
       if (symbol !== "AFTER") continue;
 
       const uri = asset.metadata.uri?.replace(/\0/g, "").trim() ?? "";
-      let artist = "";
-      let venue = "";
-      let city = "";
-      let date = "";
-      let eventName = "";
-      let ticketId = "";
+      let parsed: ReturnType<typeof parseMetadataJson> | null = null;
 
-      // Fetch metadata from the API endpoint
-      if (uri && uri.length > 0) {
+      // Handle data URI (base64 encoded JSON — most common case)
+      if (uri.startsWith("data:application/json;base64,")) {
+        try {
+          const base64 = uri.replace("data:application/json;base64,", "");
+          const json = JSON.parse(
+            Buffer.from(base64, "base64").toString("utf-8")
+          ) as {
+            name?: string;
+            attributes?: Array<{ trait_type: string; value: string }>;
+          };
+          parsed = parseMetadataJson(json);
+        } catch (_) {
+          continue;
+        }
+      // Handle regular HTTP/HTTPS URI (fallback for future integrations)
+      } else if (uri.startsWith("http")) {
         try {
           const metadataResponse = await fetch(uri);
           if (metadataResponse.ok) {
@@ -228,23 +213,22 @@ export async function fetchAftershowNftsByOwner(ownerWallet: string): Promise<Af
               name?: string;
               attributes?: Array<{ trait_type: string; value: string }>;
             };
-            const attrs = json.attributes ?? [];
-            for (const a of attrs) {
-              if (a.trait_type === "Artist") artist = a.value;
-              if (a.trait_type === "Venue") venue = a.value;
-              if (a.trait_type === "City") city = a.value;
-              if (a.trait_type === "Date") date = a.value;
-              if (a.trait_type === "Ticket ID") ticketId = a.value;
-            }
-            eventName = (json.name as string)?.replace(/^Aftershow: /, "") ?? "";
+            parsed = parseMetadataJson(json);
+          } else {
+            continue;
           }
         } catch (_) {
-          // URI fetch failed, skip this NFT
           continue;
         }
+      } else {
+        // Unknown URI format, skip
+        continue;
       }
 
-      // Regenerate artwork from ticket data (deterministic)
+      if (!parsed) continue;
+
+      const { artist, venue, city, date, ticketId, eventName } = parsed;
+
       const reconstructedTicket: EventTicket = {
         ticketId,
         eventName,
@@ -255,6 +239,7 @@ export async function fetchAftershowNftsByOwner(ownerWallet: string): Promise<Af
         claimed: true,
         verified: true,
       };
+
       const artworkSvg = generateArtwork(reconstructedTicket);
 
       results.push({
