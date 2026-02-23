@@ -97,7 +97,7 @@ export function ClaimFlow() {
       toast.loading("Sending transaction to blockchain...", { id: toastId });
 
       // Paso 4: Enviar transacción
-      const signature = await connection.sendRawTransaction(tx.serialize());
+      const signature = await connection.sendRawTransaction(tx.serialize());  
 
       toast.loading("Confirming on blockchain...", { id: toastId });
 
