@@ -97,7 +97,6 @@ export function ClaimFlow() {
       toast.loading("Sending transaction to blockchain...", { id: toastId });
 
       // Paso 4: Enviar transacción
-      const { sendRawTransaction } = await import("@solana/web3.js");
       const signature = await connection.sendRawTransaction(tx.serialize());
 
       toast.loading("Confirming on blockchain...", { id: toastId });
