@@ -200,7 +200,10 @@ export function ClaimFlow() {
         <div className="rounded-2xl border border-white/10 bg-white/5 p-8 space-y-6">
           <h2 className="text-lg font-semibold text-white">Step 2 — Verify Ticket</h2>
           <div className="flex gap-2">
+            <label htmlFor="ticket-id" className="sr-only">Ticket ID</label>
             <input
+              id="ticket-id"
+              name="ticket-id"
               type="text"
               placeholder="Ticket ID (e.g. KYD-2026-001)"
               value={ticketId}

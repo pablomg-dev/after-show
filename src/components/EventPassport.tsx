@@ -55,18 +55,17 @@ export function EventPassport({ nfts, emptyMessage, emptyCta }: EventPassportPro
     <div className="space-y-6">
       <div className="space-y-3">
         <div className="flex gap-2 flex-wrap">
-          <label className="flex items-center gap-2 text-sm text-white/60">
+          <label htmlFor="nft-search" className="flex items-center gap-2 text-sm text-white/60">
             Filter by:
           </label>
           {(["all", "artist", "city"] as const).map((filter) => (
             <button
               key={filter}
               onClick={() => setFilterBy(filter)}
-              className={`text-xs px-3 py-1.5 rounded-lg transition-colors ${
-                filterBy === filter
+              className={`text-xs px-3 py-1.5 rounded-lg transition-colors ${filterBy === filter
                   ? "bg-violet-500 text-white"
                   : "bg-white/10 text-white/70 hover:text-white"
-              }`}
+                }`}
             >
               {filter === "all" ? "All" : filter === "artist" ? "Artist" : "City"}
             </button>
@@ -75,6 +74,8 @@ export function EventPassport({ nfts, emptyMessage, emptyCta }: EventPassportPro
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
           <input
+            id="nft-search"
+            name="nft-search"
             type="text"
             placeholder={
               filterBy === "artist"
