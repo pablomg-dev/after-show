@@ -1,3 +1,7 @@
+// Fuerza que Next.js no cachee este Server Component en Vercel.
+// Sin esto, el perfil muestra datos viejos hasta que se invalida la caché manualmente.
+export const dynamic = "force-dynamic";
+
 import { Navbar } from "@/components/Navbar";
 import { EventPassport } from "@/components/EventPassport";
 import { CollectionShell } from "@/components/CollectionShell";
