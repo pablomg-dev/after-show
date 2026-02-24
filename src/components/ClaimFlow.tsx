@@ -30,7 +30,7 @@ export function ClaimFlow() {
   const [verifyError, setVerifyError] = useState<string | null>(null);
   const [mintLoading, setMintLoading] = useState(false);
   const [mintError, setMintError] = useState<string | null>(null);
-  const [mintResult, setMintResult] = useState<{ mintAddress: string } | null>(null);
+  const [mintResult, setMintResult] = useState<{ signature: string; nftName: string } | null>(null);
 
   const handleVerify = async () => {
     if (!ticketId.trim()) return;
@@ -97,7 +97,7 @@ export function ClaimFlow() {
       toast.loading("Sending transaction to blockchain...", { id: toastId });
 
       // Paso 4: Enviar transacción
-      const signature = await connection.sendRawTransaction(tx.serialize());  
+      const signature = await connection.sendRawTransaction(tx.serialize());
 
       toast.loading("Confirming on blockchain...", { id: toastId });
 
@@ -117,22 +117,16 @@ export function ClaimFlow() {
         body: JSON.stringify({ ticketId: ticket.ticketId }),
       });
 
-      // Mostrar el signature (que es el hash de la transacción)
-      setMintResult({ mintAddress: signature });
+      // Guardar la signature y avanzar al paso de éxito
+      setMintResult({ signature, nftName: ticket.eventName });
       setStep(3);
-      
+
       toast.success("🎉 Your Aftershow NFT has been minted!", {
         id: toastId,
         description: "Check your collection to see it.",
       });
-      
-      confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
 
-      // Esperar 3 segundos para que la blockchain confirme y redirigir al perfil
-      setTimeout(() => {
-        router.push(`/profile/${publicKey?.toBase58()}`);
-        router.refresh(); // fuerza re-fetch de los NFTs
-      }, 3000);
+      confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
     } catch (e) {
       const errorMsg = e instanceof Error ? e.message : "Error de conexión";
       console.error("Mint error:", e);
@@ -147,25 +141,30 @@ export function ClaimFlow() {
     return (
       <div className="max-w-lg mx-auto text-center space-y-6">
         <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 p-6">
-          <h2 className="text-xl font-bold text-emerald-400 mb-2">Success!</h2>
-          <p className="text-white/80 text-sm mb-4">
+          <h2 className="text-xl font-bold text-emerald-400 mb-2">🎉 Success!</h2>
+          <p className="text-white/80 text-sm mb-1">
             Your Aftershow NFT has been minted successfully.
           </p>
-          <p className="font-mono text-xs text-white/60 break-all">TX: {mintResult.mintAddress}</p>
-          <div className="flex flex-wrap gap-3 justify-center mt-4">
+          <p className="text-white/60 text-sm mb-4">{mintResult.nftName}</p>
+          <p className="font-mono text-xs text-white/40 break-all">TX: {mintResult.signature}</p>
+          <div className="flex flex-wrap gap-3 justify-center mt-6">
             <a
-              href={`${EXPLORER_DEVNET}/tx/${mintResult.mintAddress}?cluster=devnet`}
+              href={`${EXPLORER_DEVNET}/tx/${mintResult.signature}?cluster=devnet`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center rounded-lg bg-white/10 hover:bg-white/20 px-4 py-2 text-sm font-medium transition-colors"
             >
-              View Transaction
+              Ver transacción ↗
             </a>
             <button
-              onClick={() => router.push(`/profile/${publicKey?.toBase58()}`)}
+              type="button"
+              onClick={() => {
+                router.push(`/profile/${publicKey?.toBase58()}`);
+                router.refresh();
+              }}
               className="inline-flex items-center rounded-lg bg-gradient-to-r from-violet-500 to-pink-500 px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
             >
-              View My Collection
+              Ver mi colección
             </button>
           </div>
         </div>
