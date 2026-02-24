@@ -26,16 +26,9 @@ function avatarFromWallet(wallet: string): string {
   return `hsl(${hue}, 60%, 45%)`;
 }
 
-async function getNfts(wallet: string) {
-  const { fetchAftershowNftsByOwner } = await import("@/lib/solana");
-  return fetchAftershowNftsByOwner(wallet);
-}
 
 export default async function ProfilePage({ params }: PageProps) {
   const { wallet } = await params;
-  const nfts = await getNfts(wallet);
-  const cities = [...new Set(nfts.map((n: { city: string }) => n.city))];
-  const artists = [...new Set(nfts.map((n: { artist: string }) => n.artist))];
 
   return (
     <div className="min-h-screen bg-background">
@@ -53,17 +46,13 @@ export default async function ProfilePage({ params }: PageProps) {
               {truncateWallet(wallet)}
             </h1>
             <p className="text-white/60 text-sm mt-1">My Cultural Passport</p>
-            <div className="flex flex-wrap gap-4 mt-3 text-sm text-white/70">
-              <span>{nfts.length} events attended</span>
-              <span>{cities.length} cities</span>
-              <span>{artists.length} unique artists</span>
-            </div>
+
           </div>
         </header>
 
         <section>
           <h2 className="text-lg font-semibold text-white mb-6">Collection</h2>
-          <CollectionShell initialNfts={nfts} wallet={wallet} />
+          <CollectionShell wallet={wallet} />
         </section>
       </main>
     </div>
