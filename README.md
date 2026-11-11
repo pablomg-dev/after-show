@@ -2,6 +2,8 @@
 
 > Your ticket doesn't disappear. It becomes history.
 
+![Next.js](https://img.shields.io/badge/Next.js-14+-000000?style=flat) ![React](https://img.shields.io/badge/React-18+-61DAFB?style=flat) ![TypeScript](https://img.shields.io/badge/TypeScript-5+-3178C6?style=flat) ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3+-06B6D4?style=flat) ![Solana](https://img.shields.io/badge/Solana-web3.js%201+-9945FF?style=flat) ![Metaplex](https://img.shields.io/badge/Metaplex-UMI%200.9+-C6F462?style=flat) ![Vercel](https://img.shields.io/badge/Vercel-Deploy-000000?style=flat) [![Live demo](https://img.shields.io/badge/Live%20demo-after--show.vercel.app-22c55e?style=flat)](https://after-show.vercel.app)
+
 🔗 **Live Demo:** [after-show.vercel.app](https://after-show.vercel.app)
 
 Aftershow is the fan engagement layer built on top of the [KYD Labs](https://kydlabs.com) / [TIX](https://tix.xyz) protocol. 
